@@ -79,3 +79,6 @@ Design tokens are kept identical to the live site (`--primary:#1a5c38`, `--gold:
 
 This is a demonstration clone built for the site owner's use; all content, branding and images
 belong to Mahakal Neuro Wellness Center / Dr. Umesh Shukla.
+
+Deployed on Vercel with automatic deployments from the `main` branch.
+
