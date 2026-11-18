@@ -1,0 +1,12 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+
+# Vercel CLI
+.vercel
+
+# Local tooling
+node_modules/
+npm-debug.log*
