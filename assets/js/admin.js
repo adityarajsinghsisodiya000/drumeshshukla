@@ -6,6 +6,8 @@
 (function () {
   "use strict";
 
+  window.__mahakalAdminReady = true;
+
   var DEFAULT_HASH = "18f69c10aa929db520ed4d57a7b2ed002288600d9b42bb7fb8ee59966afb6cff";
   var STORE_KEY = "mahakal.admin.pass";
   var SESSION_KEY = "mahakal.admin.unlocked";
@@ -178,8 +180,11 @@
   }
 
   if (form) {
-    form.addEventListener("submit", function (event) {
-      event.preventDefault();
+    var busy = false;
+    var submitBtn = form.querySelector('button[type="submit"]');
+    var verify = function (event) {
+      if (event) event.preventDefault();
+      if (busy) return;
       var value = passInput.value;
       err.textContent = "";
       if (value.length < 6) {
@@ -187,16 +192,37 @@
         passInput.focus();
         return;
       }
+      busy = true;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.dataset.label = submitBtn.textContent;
+        submitBtn.textContent = "Checking…";
+      }
+      var done = function () {
+        busy = false;
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = submitBtn.dataset.label || "Unlock console";
+        }
+      };
       sha256(value).then(function (hash) {
         if (hash === storedHash()) {
           unlock();
+          done();
         } else {
           err.textContent = "That passphrase does not match. Try again.";
           passInput.select();
+          done();
         }
       }).catch(function () {
         err.textContent = "The browser blocked the passphrase check. Open https://drumeshshukla.vercel.app/admin instead.";
+        done();
       });
+    };
+    form.addEventListener("submit", verify);
+    if (submitBtn) submitBtn.addEventListener("click", verify);
+    passInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") verify(event);
     });
   }
 
