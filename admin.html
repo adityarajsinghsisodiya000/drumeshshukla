@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Admin Console | Mahakal Neuro Wellness Center</title>
+<meta name="description" content="Private site console for Mahakal Neuro Wellness Center.">
+<meta name="author" content="Aditya Raj Singh — https://github.com/adityarajsinghsisodiya000">
+<meta name="theme-color" content="#0f3d24">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body class="admin-body">
+
+<!-- ================= LOCK SCREEN ================= -->
+<div class="lock" id="lock">
+  <div class="lock__card">
+    <span class="lock__mark"><img src="assets/ayurveda_logo.png" alt="" width="52" height="52"></span>
+    <h1>Site Console</h1>
+    <p class="lock__sub">Mahakal Neuro Wellness Center</p>
+
+    <form id="lockForm" autocomplete="off" novalidate>
+      <label for="pass">Passphrase</label>
+      <div class="lock__field">
+        <input id="pass" name="pass" type="password" placeholder="Enter passphrase" autocomplete="current-password" required minlength="6">
+        <button type="button" class="lock__eye" id="togglePass" aria-label="Show passphrase" aria-pressed="false">Show</button>
+      </div>
+      <p class="lock__err" id="lockErr" role="alert" aria-live="polite"></p>
+      <button class="btn btn--gold lock__btn" type="submit">Unlock console</button>
+    </form>
+
+    <p class="lock__note">
+      <strong>Note:</strong> this is a static website. The passphrase only locks the interface on
+      this device — it is not server-side authentication and no private data is stored here.
+    </p>
+    <a class="lock__back" href="index.html">← Back to website</a>
+  </div>
+</div>
+
+<!-- ================= CONSOLE ================= -->
+<div class="console" id="console" hidden>
+  <header class="console__bar">
+    <div class="console__brand">
+      <span class="console__mark"><img src="assets/ayurveda_logo.png" alt="" width="38" height="38"></span>
+      <span>
+        <strong>Site Console</strong>
+        <small>Mahakal Neuro Wellness Center</small>
+      </span>
+    </div>
+    <div class="console__actions">
+      <a class="console__link" href="index.html" target="_blank" rel="noopener">Open site ↗</a>
+      <button class="console__logout" id="logout" type="button">Lock</button>
+    </div>
+  </header>
+
+  <nav class="console__tabs" aria-label="Console sections">
+    <button class="tab is-active" data-tab="overview" aria-selected="true">Overview</button>
+    <button class="tab" data-tab="pages" aria-selected="false">Pages</button>
+    <button class="tab" data-tab="security" aria-selected="false">Security</button>
+    <button class="tab" data-tab="contact" aria-selected="false">Contact</button>
+    <button class="tab" data-tab="deploy" aria-selected="false">Deploy</button>
+  </nav>
+
+  <main class="console__main">
+
+    <!-- OVERVIEW -->
+    <section class="panel is-active" id="panel-overview" aria-labelledby="h-overview">
+      <h2 id="h-overview">Overview</h2>
+      <div class="stat-grid">
+        <article class="stat">
+          <span class="stat__label">Live website</span>
+          <strong class="stat__value" id="statLive">checking…</strong>
+          <span class="stat__meta" id="statLiveMeta">drumeshshukla.vercel.app</span>
+        </article>
+        <article class="stat">
+          <span class="stat__label">Pages online</span>
+          <strong class="stat__value" id="statPages">—</strong>
+          <span class="stat__meta">HTML routes</span>
+        </article>
+        <article class="stat">
+          <span class="stat__label">Last commit</span>
+          <strong class="stat__value" id="statCommit">—</strong>
+          <span class="stat__meta" id="statCommitMeta">reads the GitHub repo</span>
+        </article>
+        <article class="stat">
+          <span class="stat__label">Security score</span>
+          <strong class="stat__value" id="statScore">—</strong>
+          <span class="stat__meta" id="statScoreMeta">header checks</span>
+        </article>
+      </div>
+
+      <h3>Quick links</h3>
+      <ul class="link-list">
+        <li><a href="https://drumeshshukla.vercel.app" target="_blank" rel="noopener">Live site<small>drumeshshukla.vercel.app</small></a></li>
+        <li><a href="https://vercel.com/baneshwari/drumeshshukla" target="_blank" rel="noopener">Vercel dashboard<small>deployments &amp; logs</small></a></li>
+        <li><a href="https://github.com/adityarajsinghsisodiya000/drumeshshukla" target="_blank" rel="noopener">GitHub repository<small>source of truth</small></a></li>
+        <li><a href="https://search.google.com/search-console" target="_blank" rel="noopener">Search Console<small>indexing &amp; queries</small></a></li>
+      </ul>
+    </section>
+
+    <!-- PAGES -->
+    <section class="panel" id="panel-pages" aria-labelledby="h-pages" hidden>
+      <div class="panel__head">
+        <h2 id="h-pages">Pages</h2>
+        <button class="btn btn--ghost btn--sm" id="recheckPages" type="button">Re-check all</button>
+      </div>
+      <p class="hint">Live response for every route on the production domain.</p>
+      <div class="table-wrap">
+        <table class="table" id="pagesTable">
+          <thead>
+            <tr><th scope="col">Route</th><th scope="col">Status</th><th scope="col">Size</th><th scope="col">Time</th><th scope="col"></th></tr>
+          </thead>
+          <tbody><tr><td colspan="5" class="table__empty">Checking…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECURITY -->
+    <section class="panel" id="panel-security" aria-labelledby="h-security" hidden>
+      <div class="panel__head">
+        <h2 id="h-security">Security</h2>
+        <button class="btn btn--ghost btn--sm" id="recheckSecurity" type="button">Re-run checks</button>
+      </div>
+      <p class="hint">Reads the live response headers and page markup from this domain.</p>
+      <div class="check-grid" id="checkGrid"></div>
+      <h3>Notes</h3>
+      <ul class="notes">
+        <li>No backend, no database and no cookies are used, so there is no server to attack.</li>
+        <li>Forms never post to a server — they hand the visitor to WhatsApp, so no lead data is stored.</li>
+        <li>The public repository is the only way to change content; keep GitHub and Vercel accounts protected with 2FA.</li>
+        <li>The passphrase here is a convenience lock, not real authentication.</li>
+      </ul>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="panel" id="panel-contact" aria-labelledby="h-contact" hidden>
+      <h2 id="h-contact">Contact details used on the site</h2>
+      <div class="copy-grid">
+        <div class="copy-item"><span>Main phone / WhatsApp</span><strong>+91 9993032780</strong><button class="copy-btn" data-copy="+91 9993032780" type="button">Copy</button></div>
+        <div class="copy-item"><span>Center phone</span><strong>+91 8962153087</strong><button class="copy-btn" data-copy="+91 8962153087" type="button">Copy</button></div>
+        <div class="copy-item"><span>Clinic address</span><strong>17, Kalidas Marg, Freegunj, Ujjain – 456010</strong><button class="copy-btn" data-copy="17, KALIDAS MARG, FREEGUNJ, UJJAIN - 456010" type="button">Copy</button></div>
+        <div class="copy-item"><span>Center address</span><strong>"Shri Mahakaleshwar Ayurved Bhawan", Maksi Road, Freeganj, Ujjain – 456010</strong><button class="copy-btn" data-copy="&quot;Shri Mahakaleshwar Ayurved Bhawan&quot;, Maksi Road, near Dr. Bhoraskar, Freeganj, Ujjain - 456010, MP" type="button">Copy</button></div>
+        <div class="copy-item"><span>OPD timings</span><strong>Mon–Sat · 12:00–3:30 PM &amp; 6:00–8:00 PM</strong><button class="copy-btn" data-copy="Mon-Sat 12:00-3:30 PM &amp; 6:00-8:00 PM" type="button">Copy</button></div>
+        <div class="copy-item"><span>Registration</span><strong>M.P. Board Reg. No. 49391</strong><button class="copy-btn" data-copy="M.P. Board Reg. No. 49391" type="button">Copy</button></div>
+      </div>
+
+      <h3>Social &amp; review links</h3>
+      <ul class="link-list">
+        <li><a href="https://www.facebook.com/profile.php?id=61589805816757" target="_blank" rel="noopener">Facebook<small>profile.php?id=61589805816757</small></a></li>
+        <li><a href="https://www.instagram.com/dr_umesh_shukla/" target="_blank" rel="noopener">Instagram<small>@dr_umesh_shukla</small></a></li>
+        <li><a href="https://www.google.com/maps/place/Mahakal+Ayurveda+-+Neuro+Spine+Panchkarma+Center/@23.1809704,75.7876247,17z" target="_blank" rel="noopener">Google Maps<small>clinic listing</small></a></li>
+        <li><a href="https://search.google.com/local/writereview?placeid=ChIJe7Vbnj51YzkRvKglRt5k9mc" target="_blank" rel="noopener">Google review link<small>send to happy patients</small></a></li>
+      </ul>
+    </section>
+
+    <!-- DEPLOY -->
+    <section class="panel" id="panel-deploy" aria-labelledby="h-deploy" hidden>
+      <h2 id="h-deploy">Publish changes</h2>
+      <p class="hint">Every push to <code>main</code> deploys automatically to production.</p>
+      <ol class="steps">
+        <li><strong>Edit</strong> the files in the project folder on your computer.</li>
+        <li><strong>Preview</strong> locally (or just review the page).</li>
+        <li><strong>Publish</strong> with the two commands below.</li>
+      </ol>
+      <pre class="code"><code id="deployCmd">git add -A
+git commit -m "content update"
+git push</code></pre>
+      <button class="btn btn--gold btn--sm" data-copy="git add -A&#10;git commit -m &quot;content update&quot;&#10;git push" type="button">Copy commands</button>
+
+      <h3>Console passphrase</h3>
+      <p class="hint">Stored only in this browser (hashed). Default: <code>Mahakal@2026</code></p>
+      <form class="pass-form" id="passForm" autocomplete="off">
+        <label for="newPass">New passphrase</label>
+        <input id="newPass" type="password" minlength="6" placeholder="At least 6 characters" required>
+        <button class="btn btn--green btn--sm" type="submit">Save on this device</button>
+        <p class="pass-form__msg" id="passMsg" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+  </main>
+
+  <footer class="console__foot">
+    <span>Designed &amp; Developed by <a href="https://github.com/adityarajsinghsisodiya000" target="_blank" rel="noopener">Aditya Raj Singh</a></span>
+    <span id="year">2026</span>
+  </footer>
+</div>
+
+<script src="assets/js/admin.js"></script>
+</body>
+</html>
