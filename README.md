@@ -54,7 +54,9 @@ Production deployment: **https://drumeshshukla.vercel.app** (Vercel)
 
 ## Designed & developed by
 
-**Aditya Raj Singh** — [github.com/hackertermuxx](https://github.com/hackertermuxx)
+**Aditya Raj Singh** — [github.com/adityarajsinghsisodiya000](https://github.com/adityarajsinghsisodiya000)
+
+Source: [github.com/adityarajsinghsisodiya000/drumeshshukla](https://github.com/adityarajsinghsisodiya000/drumeshshukla)
 
 ## Structure
 

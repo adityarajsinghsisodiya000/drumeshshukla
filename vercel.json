@@ -2,6 +2,9 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    { "source": "/blog/:slug", "destination": "/blog-:slug.html", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",

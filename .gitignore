@@ -10,3 +10,6 @@ desktop.ini
 # Local tooling
 node_modules/
 npm-debug.log*
+
+.vercel
+.env*
