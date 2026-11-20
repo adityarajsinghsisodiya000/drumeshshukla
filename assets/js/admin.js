@@ -34,13 +34,95 @@
   var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
 
   /* ---------------- helpers ---------------- */
+  /* Small SHA-256 fallback so the lock also works when the file is opened
+     directly from disk (file://) where crypto.subtle is unavailable. */
+  function sha256Sync(ascii) {
+    function rightRotate(value, amount) {
+      return (value >>> amount) | (value << (32 - amount));
+    }
+    var mathPow = Math.pow;
+    var maxWord = mathPow(2, 32);
+    var result = "";
+    var words = [];
+    var asciiBitLength = ascii.length * 8;
+    var hash = (sha256Sync.h = sha256Sync.h || []);
+    var k = (sha256Sync.k = sha256Sync.k || []);
+    var primeCounter = k.length;
+    var isComposite = {};
+    for (var candidate = 2; primeCounter < 64; candidate++) {
+      if (!isComposite[candidate]) {
+        for (var i = 0; i < 313; i += candidate) isComposite[i] = candidate;
+        hash[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0;
+        k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+      }
+    }
+    ascii += "\x80";
+    while ((ascii.length % 64) - 56) ascii += "\x00";
+    for (var j = 0; j < ascii.length; j++) {
+      var code = ascii.charCodeAt(j);
+      if (code >> 8) return "";
+      words[j >> 2] |= code << (((3 - j) % 4) * 8);
+    }
+    words[words.length] = (asciiBitLength / maxWord) | 0;
+    words[words.length] = asciiBitLength;
+
+    for (var block = 0; block < words.length; ) {
+      var w = words.slice(block, (block += 16));
+      var oldHash = hash;
+      hash = hash.slice(0, 8);
+      for (var round = 0; round < 64; round++) {
+        var w15 = w[round - 15];
+        var w2 = w[round - 2];
+        var t1 =
+          hash[7] +
+          (rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25)) +
+          ((hash[4] & hash[5]) ^ (~hash[4] & hash[6])) +
+          k[round] +
+          (w[round] =
+            round < 16
+              ? w[round]
+              : (w[round - 16] +
+                  (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3)) +
+                  w[round - 7] +
+                  (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))) |
+                0);
+        var t2 =
+          (rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22)) +
+          ((hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]));
+        hash = [(t1 + t2) | 0].concat(hash);
+        hash[4] = (hash[4] + t1) | 0;
+      }
+      for (var n = 0; n < 8; n++) hash[n] = (hash[n] + oldHash[n]) | 0;
+    }
+    for (var m = 0; m < 8; m++) {
+      for (var b = 3; b + 1; b--) {
+        var byte = (hash[m] >> (b * 8)) & 255;
+        result += (byte < 16 ? "0" : "") + byte.toString(16);
+      }
+    }
+    return result;
+  }
+
   function sha256(text) {
-    var data = new TextEncoder().encode("mahakal-admin::" + text);
-    return crypto.subtle.digest("SHA-256", data).then(function (buf) {
-      return Array.prototype.map
-        .call(new Uint8Array(buf), function (b) { return ("0" + b.toString(16)).slice(-2); })
-        .join("");
-    });
+    var raw = "mahakal-admin::" + text;
+    if (window.crypto && window.crypto.subtle && window.isSecureContext) {
+      var data = new TextEncoder().encode(raw);
+      return crypto.subtle.digest("SHA-256", data).then(function (buf) {
+        return Array.prototype.map
+          .call(new Uint8Array(buf), function (b) { return ("0" + b.toString(16)).slice(-2); })
+          .join("");
+      });
+    }
+    var bytes = "";
+    for (var i = 0; i < raw.length; i++) {
+      var code = raw.charCodeAt(i);
+      if (code < 128) bytes += String.fromCharCode(code);
+      else {
+        var encoded = unescape(encodeURIComponent(raw.charAt(i)));
+        for (var j = 0; j < encoded.length; j++) bytes += encoded.charAt(j);
+      }
+    }
+    return Promise.resolve(sha256Sync(bytes));
   }
 
   function storedHash() {
@@ -112,6 +194,8 @@
           err.textContent = "That passphrase does not match. Try again.";
           passInput.select();
         }
+      }).catch(function () {
+        err.textContent = "The browser blocked the passphrase check. Open https://drumeshshukla.vercel.app/admin instead.";
       });
     });
   }
@@ -367,6 +451,27 @@
   }
 
   /* ---------------- boot ---------------- */
+  function envBanner() {
+    var host = location.hostname;
+    var isLocal =
+      location.protocol === "file:" ||
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host === "" ||
+      /^192\.168\.|^10\./.test(host);
+    if (!isLocal) return;
+    var card = document.querySelector(".lock__card");
+    if (!card) return;
+    var note = el(
+      "p",
+      "lock__env",
+      location.protocol === "file:"
+        ? "Ye file seedha disk se khuli hai. Live checks aur deploy ke liye kholiye: https://drumeshshukla.vercel.app/admin"
+        : "Local preview mode — live checks sirf deployed site par chalte hain: https://drumeshshukla.vercel.app/admin"
+    );
+    card.insertBefore(note, card.querySelector("form"));
+  }
+
   var yearEl = $("#year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
@@ -384,6 +489,7 @@
 
   var unlocked = false;
   try { unlocked = sessionStorage.getItem(SESSION_KEY) === "1"; } catch (e) {}
+  envBanner();
   if (unlocked) unlock();
   else if (passInput) passInput.focus();
 })();

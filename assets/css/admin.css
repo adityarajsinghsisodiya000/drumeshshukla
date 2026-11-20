@@ -123,6 +123,26 @@
   color: rgba(255, 255, 255, 0.55);
 }
 .lock__back:hover { color: var(--gold-light); }
+.lock__env {
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(232, 201, 109, 0.12);
+  border: 1px solid rgba(232, 201, 109, 0.35);
+  color: #f2e2b4;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  text-align: left;
+}
+.admin-noscript {
+  margin: 0;
+  padding: 16px;
+  background: #7a2a1c;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  text-align: center;
+}
 
 /* ---------------- shell ---------------- */
 .console { min-height: 100vh; display: flex; flex-direction: column; }
