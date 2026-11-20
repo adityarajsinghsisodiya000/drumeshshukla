@@ -7,6 +7,15 @@
   ],
   "headers": [
     {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    },
+    {
       "source": "/assets/images/(.*)",
       "headers": [
         {
@@ -25,20 +34,20 @@
       ]
     },
     {
-      "source": "/assets/(css|js)/(.*)",
+      "source": "/assets/css/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
+          "value": "public, max-age=300, must-revalidate"
         }
       ]
     },
     {
-      "source": "/assets/(.*)",
+      "source": "/assets/js/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=3600"
+          "value": "public, max-age=300, must-revalidate"
         }
       ]
     },
