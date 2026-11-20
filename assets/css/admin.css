@@ -14,6 +14,30 @@
   -webkit-font-smoothing: antialiased;
 }
 
+[hidden] { display: none !important; }
+
+.console__tag {
+  margin-left: 4px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.6rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.console__tag.is-ok {
+  color: #7fe3a5;
+  border-color: rgba(37, 211, 102, 0.35);
+  background: rgba(37, 211, 102, 0.12);
+}
+.console__tag.is-bad {
+  color: #ffb4a6;
+  border-color: rgba(255, 120, 100, 0.4);
+  background: rgba(255, 120, 100, 0.14);
+}
+
 /* ---------------- lock screen ---------------- */
 .lock {
   min-height: 100vh;

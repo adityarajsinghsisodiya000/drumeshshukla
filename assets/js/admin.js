@@ -1,18 +1,14 @@
 /* ============================================================
-   ADMIN CONSOLE — client-side only
-   Nothing here is secret: the site is static, so this page only
-   provides convenience tooling and a per-device interface lock.
+   ADMIN CONSOLE — client-side site checks
+   Everything handled here is public information, so there is no
+   login: the page only reports on the deployed website.
    ============================================================ */
 (function () {
   "use strict";
 
   window.__mahakalAdminReady = true;
 
-  var DEFAULT_HASH = "18f69c10aa929db520ed4d57a7b2ed002288600d9b42bb7fb8ee59966afb6cff";
-  var STORE_KEY = "mahakal.admin.pass";
-  var SESSION_KEY = "mahakal.admin.unlocked";
   var REPO = "adityarajsinghsisodiya000/drumeshshukla";
-  var SITE = "https://drumeshshukla.vercel.app";
 
   var PAGES = [
     { path: "/", label: "Home" },
@@ -36,101 +32,6 @@
   var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
 
   /* ---------------- helpers ---------------- */
-  /* Small SHA-256 fallback so the lock also works when the file is opened
-     directly from disk (file://) where crypto.subtle is unavailable. */
-  function sha256Sync(ascii) {
-    function rightRotate(value, amount) {
-      return (value >>> amount) | (value << (32 - amount));
-    }
-    var mathPow = Math.pow;
-    var maxWord = mathPow(2, 32);
-    var result = "";
-    var words = [];
-    var asciiBitLength = ascii.length * 8;
-    var hash = (sha256Sync.h = sha256Sync.h || []);
-    var k = (sha256Sync.k = sha256Sync.k || []);
-    var primeCounter = k.length;
-    var isComposite = {};
-    for (var candidate = 2; primeCounter < 64; candidate++) {
-      if (!isComposite[candidate]) {
-        for (var i = 0; i < 313; i += candidate) isComposite[i] = candidate;
-        hash[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0;
-        k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
-      }
-    }
-    ascii += "\x80";
-    while ((ascii.length % 64) - 56) ascii += "\x00";
-    for (var j = 0; j < ascii.length; j++) {
-      var code = ascii.charCodeAt(j);
-      if (code >> 8) return "";
-      words[j >> 2] |= code << (((3 - j) % 4) * 8);
-    }
-    words[words.length] = (asciiBitLength / maxWord) | 0;
-    words[words.length] = asciiBitLength;
-
-    for (var block = 0; block < words.length; ) {
-      var w = words.slice(block, (block += 16));
-      var oldHash = hash;
-      hash = hash.slice(0, 8);
-      for (var round = 0; round < 64; round++) {
-        var w15 = w[round - 15];
-        var w2 = w[round - 2];
-        var t1 =
-          hash[7] +
-          (rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25)) +
-          ((hash[4] & hash[5]) ^ (~hash[4] & hash[6])) +
-          k[round] +
-          (w[round] =
-            round < 16
-              ? w[round]
-              : (w[round - 16] +
-                  (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3)) +
-                  w[round - 7] +
-                  (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))) |
-                0);
-        var t2 =
-          (rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22)) +
-          ((hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]));
-        hash = [(t1 + t2) | 0].concat(hash);
-        hash[4] = (hash[4] + t1) | 0;
-      }
-      for (var n = 0; n < 8; n++) hash[n] = (hash[n] + oldHash[n]) | 0;
-    }
-    for (var m = 0; m < 8; m++) {
-      for (var b = 3; b + 1; b--) {
-        var byte = (hash[m] >> (b * 8)) & 255;
-        result += (byte < 16 ? "0" : "") + byte.toString(16);
-      }
-    }
-    return result;
-  }
-
-  function sha256(text) {
-    var raw = "mahakal-admin::" + text;
-    if (window.crypto && window.crypto.subtle && window.isSecureContext) {
-      var data = new TextEncoder().encode(raw);
-      return crypto.subtle.digest("SHA-256", data).then(function (buf) {
-        return Array.prototype.map
-          .call(new Uint8Array(buf), function (b) { return ("0" + b.toString(16)).slice(-2); })
-          .join("");
-      });
-    }
-    var bytes = "";
-    for (var i = 0; i < raw.length; i++) {
-      var code = raw.charCodeAt(i);
-      if (code < 128) bytes += String.fromCharCode(code);
-      else {
-        var encoded = unescape(encodeURIComponent(raw.charAt(i)));
-        for (var j = 0; j < encoded.length; j++) bytes += encoded.charAt(j);
-      }
-    }
-    return Promise.resolve(sha256Sync(bytes));
-  }
-
-  function storedHash() {
-    try { return localStorage.getItem(STORE_KEY) || DEFAULT_HASH; } catch (e) { return DEFAULT_HASH; }
-  }
-
   function fmtBytes(n) {
     if (!n && n !== 0) return "—";
     if (n < 1024) return n + " B";
@@ -144,90 +45,6 @@
     if (text != null) node.textContent = text;
     return node;
   }
-
-  /* ---------------- lock ---------------- */
-  var lock = $("#lock");
-  var consoleEl = $("#console");
-
-  function unlock() {
-    lock.hidden = true;
-    consoleEl.hidden = false;
-    try { sessionStorage.setItem(SESSION_KEY, "1"); } catch (e) {}
-    initConsole();
-  }
-
-  function lockAgain() {
-    try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
-    consoleEl.hidden = true;
-    lock.hidden = false;
-    var pass = $("#pass");
-    if (pass) { pass.value = ""; pass.focus(); }
-  }
-
-  var form = $("#lockForm");
-  var err = $("#lockErr");
-  var passInput = $("#pass");
-  var toggle = $("#togglePass");
-
-  if (toggle) {
-    toggle.addEventListener("click", function () {
-      var show = passInput.type === "password";
-      passInput.type = show ? "text" : "password";
-      toggle.textContent = show ? "Hide" : "Show";
-      toggle.setAttribute("aria-pressed", show ? "true" : "false");
-      toggle.setAttribute("aria-label", show ? "Hide passphrase" : "Show passphrase");
-    });
-  }
-
-  if (form) {
-    var busy = false;
-    var submitBtn = form.querySelector('button[type="submit"]');
-    var verify = function (event) {
-      if (event) event.preventDefault();
-      if (busy) return;
-      var value = passInput.value;
-      err.textContent = "";
-      if (value.length < 6) {
-        err.textContent = "Passphrase must be at least 6 characters.";
-        passInput.focus();
-        return;
-      }
-      busy = true;
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.dataset.label = submitBtn.textContent;
-        submitBtn.textContent = "Checking…";
-      }
-      var done = function () {
-        busy = false;
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = submitBtn.dataset.label || "Unlock console";
-        }
-      };
-      sha256(value).then(function (hash) {
-        if (hash === storedHash()) {
-          unlock();
-          done();
-        } else {
-          err.textContent = "That passphrase does not match. Try again.";
-          passInput.select();
-          done();
-        }
-      }).catch(function () {
-        err.textContent = "The browser blocked the passphrase check. Open https://drumeshshukla.vercel.app/admin instead.";
-        done();
-      });
-    };
-    form.addEventListener("submit", verify);
-    if (submitBtn) submitBtn.addEventListener("click", verify);
-    passInput.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") verify(event);
-    });
-  }
-
-  var logoutBtn = $("#logout");
-  if (logoutBtn) logoutBtn.addEventListener("click", lockAgain);
 
   /* ---------------- tabs ---------------- */
   function showTab(name) {
@@ -249,11 +66,12 @@
 
   /* ---------------- copy ---------------- */
   document.addEventListener("click", function (event) {
-    var btn = event.target.closest("[data-copy]");
+    var target = event.target;
+    var btn = target && target.closest ? target.closest("[data-copy]") : null;
     if (!btn) return;
     var text = btn.getAttribute("data-copy");
+    var original = btn.textContent;
     var done = function () {
-      var original = btn.textContent;
       btn.textContent = "Copied";
       btn.classList.add("is-done");
       setTimeout(function () {
@@ -277,6 +95,7 @@
   function checkLive() {
     var value = $("#statLive");
     var meta = $("#statLiveMeta");
+    if (!value) return;
     var started = performance.now();
     fetch("/?probe=" + Date.now(), { cache: "no-store" })
       .then(function (res) {
@@ -295,14 +114,14 @@
   function checkCommit() {
     var value = $("#statCommit");
     var meta = $("#statCommitMeta");
+    if (!value) return;
     fetch("https://api.github.com/repos/" + REPO + "/commits?per_page=1", {
       headers: { Accept: "application/vnd.github+json" }
     })
       .then(function (res) { return res.ok ? res.json() : Promise.reject(res.status); })
       .then(function (list) {
         if (!list.length) throw new Error("empty");
-        var sha = list[0].sha.slice(0, 7);
-        value.textContent = sha;
+        value.textContent = list[0].sha.slice(0, 7);
         meta.textContent = list[0].commit.message.split("\n")[0].slice(0, 44);
       })
       .catch(function () {
@@ -314,6 +133,7 @@
   /* ---------------- pages ---------------- */
   function checkPages() {
     var tbody = $("#pagesTable tbody");
+    if (!tbody) return;
     tbody.innerHTML = "";
     var ok = 0;
     PAGES.forEach(function (page) {
@@ -327,12 +147,11 @@
       var statusCell = el("td", null, "…");
       var sizeCell = el("td", null, "—");
       var timeCell = el("td", null, "—");
-      var actionCell = el("td");
       row.appendChild(routeCell);
       row.appendChild(statusCell);
       row.appendChild(sizeCell);
       row.appendChild(timeCell);
-      row.appendChild(actionCell);
+      row.appendChild(el("td"));
       tbody.appendChild(row);
 
       var started = performance.now();
@@ -436,86 +255,36 @@
         } else addCheck(grid, "bad", "No secrets in markup", "A token-like string is present in the HTML.");
 
         total++;
-        var forms = html.match(/<form[^>]*action="(?!\s*")/g) || [];
-        if (!forms.length) { ok++; addCheck(grid, "ok", "No server-side form posts", "Forms are handled in the browser and hand off to WhatsApp — nothing is stored."); }
-        else addCheck(grid, "warn", "Forms post to a server", "Verify the endpoint handles validation and rate limiting.");
+        if (!/<form[^>]*action="[^"]+"/i.test(html)) {
+          ok++; addCheck(grid, "ok", "No server-side form posts", "Forms are handled in the browser and hand off to WhatsApp — nothing is stored.");
+        } else addCheck(grid, "warn", "Forms post to a server", "Verify the endpoint handles validation and rate limiting.");
 
         settle();
         return null;
       })
       .catch(function () {
-        addCheck(grid, "bad", "Checks failed", "The request was blocked or offline.");
+        addCheck(grid, "bad", "Checks failed", "The request was blocked or the browser is offline.");
         settle();
       });
   }
 
-  /* ---------------- passphrase change ---------------- */
-  var passForm = $("#passForm");
-  if (passForm) {
-    passForm.addEventListener("submit", function (event) {
-      event.preventDefault();
-      var input = $("#newPass");
-      var msg = $("#passMsg");
-      var value = input.value;
-      if (value.length < 6) {
-        msg.textContent = "Use at least 6 characters.";
-        msg.style.color = "#ff9b8a";
-        return;
-      }
-      sha256(value).then(function (hash) {
-        try {
-          localStorage.setItem(STORE_KEY, hash);
-          msg.style.color = "#7fe3a5";
-          msg.textContent = "Saved for this browser only.";
-          input.value = "";
-        } catch (e) {
-          msg.style.color = "#ff9b8a";
-          msg.textContent = "Browser storage is unavailable.";
-        }
-      });
-    });
-  }
-
   /* ---------------- boot ---------------- */
-  function envBanner() {
-    var host = location.hostname;
-    var isLocal =
-      location.protocol === "file:" ||
-      host === "localhost" ||
-      host === "127.0.0.1" ||
-      host === "" ||
-      /^192\.168\.|^10\./.test(host);
-    if (!isLocal) return;
-    var card = document.querySelector(".lock__card");
-    if (!card) return;
-    var note = el(
-      "p",
-      "lock__env",
-      location.protocol === "file:"
-        ? "Ye file seedha disk se khuli hai. Live checks aur deploy ke liye kholiye: https://drumeshshukla.vercel.app/admin"
-        : "Local preview mode — live checks sirf deployed site par chalte hain: https://drumeshshukla.vercel.app/admin"
-    );
-    card.insertBefore(note, card.querySelector("form"));
+  var bootState = $("#bootState");
+  if (bootState) {
+    bootState.textContent = "scripts running";
+    bootState.classList.add("is-ok");
   }
 
   var yearEl = $("#year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  function initConsole() {
-    checkLive();
-    checkCommit();
-    checkPages();
-    runSecurity();
-  }
+  checkLive();
+  checkCommit();
+  checkPages();
+  runSecurity();
 
   var rePages = $("#recheckPages");
   if (rePages) rePages.addEventListener("click", checkPages);
   var reSec = $("#recheckSecurity");
   if (reSec) reSec.addEventListener("click", runSecurity);
-
-  var unlocked = false;
-  try { unlocked = sessionStorage.getItem(SESSION_KEY) === "1"; } catch (e) {}
-  envBanner();
-  if (unlocked) unlock();
-  else if (passInput) passInput.focus();
 })();
