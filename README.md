@@ -64,6 +64,13 @@ console. This is the only page on the site with a backend.
 | Contact | Phone, addresses, OPD timings, social and review links with copy buttons |
 | Deploy | Publish commands and how the data flow works |
 
+**One-tap access (owner's own devices)**
+
+`/api/enter?t=<ADMIN_ACCESS_TOKEN>` sets a 30-day session and redirects straight to the console, so
+the password never has to be typed on a trusted device. The token lives in the environment — change
+`ADMIN_ACCESS_TOKEN` and every saved link stops working instantly. Until then, treat that URL like
+a password.
+
 **How it is secured**
 
 - `POST /api/login` compares the password against a scrypt hash (`ADMIN_PASSWORD_HASH`) with
