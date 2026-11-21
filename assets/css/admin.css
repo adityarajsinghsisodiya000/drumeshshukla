@@ -106,6 +106,29 @@
   border-color: rgba(232, 201, 109, 0.7);
   box-shadow: 0 0 0 4px rgba(232, 201, 109, 0.14);
 }
+.lock label.lock__remember {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 14px 0 4px;
+  font-size: 0.74rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  user-select: none;
+}
+.lock__remember input {
+  width: 17px;
+  height: 17px;
+  min-height: 0;
+  padding: 0;
+  accent-color: var(--gold);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.lock__remember span { line-height: 1.4; }
+
 .lock__eye {
   position: absolute;
   top: 50%;

@@ -48,6 +48,7 @@ module.exports = async function handler(req, res) {
     }
   }
   const password = body && typeof body.password === "string" ? body.password : "";
+  const remember = !!(body && body.remember);
   if (!password || password.length > 200) {
     res.status(400).json({ error: "invalid_request" });
     return;
@@ -59,6 +60,6 @@ module.exports = async function handler(req, res) {
   }
 
   attempts.delete(ip);
-  res.setHeader("Set-Cookie", setCookie());
-  res.status(200).json({ ok: true });
+  res.setHeader("Set-Cookie", setCookie(remember));
+  res.status(200).json({ ok: true, days: remember ? 30 : 0 });
 };

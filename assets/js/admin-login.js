@@ -9,6 +9,7 @@
   var error = document.getElementById("loginErr");
   var button = document.getElementById("loginBtn");
   var toggle = document.getElementById("togglePass");
+  var remember = document.getElementById("remember");
 
   if (toggle) {
     toggle.addEventListener("click", function () {
@@ -39,7 +40,7 @@
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "same-origin",
-      body: JSON.stringify({ password: value })
+      body: JSON.stringify({ password: value, remember: remember ? remember.checked : false })
     })
       .then(function (res) {
         return res.json().catch(function () { return {}; }).then(function (body) {

@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0f3d24">
 <link rel="stylesheet" href="/assets/css/fonts.css">
 <link rel="stylesheet" href="/assets/css/style.css">
-<link rel="stylesheet" href="/assets/css/admin.css?v=10">
+<link rel="stylesheet" href="/assets/css/admin.css?v=11">
 </head>
 <body class="admin-body">
 <div class="lock">
@@ -23,19 +23,24 @@
         <input id="password" name="password" type="password" placeholder="Enter admin password" autocomplete="current-password" required minlength="6">
         <button type="button" class="lock__eye" id="togglePass" aria-label="Show password" aria-pressed="false">Show</button>
       </div>
+      <label class="lock__remember" for="remember">
+        <input id="remember" name="remember" type="checkbox" checked>
+        <span>Is device par 30 din tak signed in rakhein</span>
+      </label>
       <p class="lock__err" id="loginErr" role="alert" aria-live="polite"></p>
       <button class="btn btn--gold lock__btn" id="loginBtn" type="submit">Sign in</button>
     </form>
 
     <p class="lock__note">
-      Server-verified login. The session cookie is HttpOnly, Secure and expires after 8 hours.
-      Eight wrong attempts from one IP pause logins for 10 minutes.
+      Server-verified login. The session cookie is HttpOnly and Secure — it lasts 8 hours,
+      or 30 days if you keep the box ticked. Eight wrong attempts from one IP pause logins for 10 minutes.
     </p>
     <a class="lock__back" href="/">← Back to website</a>
   </div>
 </div>
-<script src="/assets/js/admin-guard.js?v=10"></script>
-<script src="/assets/js/admin-login.js?v=10"></script>
+<script src="/assets/js/admin-guard.js?v=11"></script>
+<script src="/assets/js/admin-login.js?v=11"></script>
 </body>
 </html>
+
 

@@ -3,7 +3,8 @@
 const crypto = require("node:crypto");
 
 const COOKIE = "mkc_admin";
-const MAX_AGE_SECONDS = 8 * 60 * 60;
+const SESSION_SECONDS = 8 * 60 * 60;
+const REMEMBER_SECONDS = 30 * 24 * 60 * 60;
 
 function secret() {
   return process.env.SESSION_SECRET || "";
@@ -13,9 +14,9 @@ function sign(payload) {
   return crypto.createHmac("sha256", secret()).update(payload).digest("base64url");
 }
 
-function createToken() {
+function createToken(seconds) {
   const payload = Buffer.from(
-    JSON.stringify({ sub: "admin", exp: Date.now() + MAX_AGE_SECONDS * 1000 })
+    JSON.stringify({ sub: "admin", exp: Date.now() + seconds * 1000 })
   ).toString("base64url");
   return payload + "." + sign(payload);
 }
@@ -50,8 +51,11 @@ function isAuthed(req) {
   return verifyToken(parseCookies(req)[COOKIE]);
 }
 
-function setCookie() {
-  return COOKIE + "=" + createToken() + "; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=" + MAX_AGE_SECONDS;
+function setCookie(remember) {
+  const seconds = remember ? REMEMBER_SECONDS : SESSION_SECONDS;
+  return (
+    COOKIE + "=" + createToken(seconds) + "; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=" + seconds
+  );
 }
 
 function clearCookie() {
