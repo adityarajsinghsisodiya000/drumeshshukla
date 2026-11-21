@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0f3d24">
 <link rel="stylesheet" href="/assets/css/fonts.css">
 <link rel="stylesheet" href="/assets/css/style.css">
-<link rel="stylesheet" href="/assets/css/admin.css?v=7">
+<link rel="stylesheet" href="/assets/css/admin.css?v=8">
 </head>
 <body class="admin-body">
 <noscript><p class="admin-noscript">This console needs JavaScript. Enable it and reload.</p></noscript>
@@ -29,17 +29,17 @@
     </div>
   </header>
 
-  <nav class="console__tabs" aria-label="Console sections">
-    <button class="tab is-active" data-tab="leads" aria-selected="true">Enquiries <span class="tab__badge" id="newCount" hidden>0</span></button>
-    <button class="tab" data-tab="health" aria-selected="false">Site health</button>
-    <button class="tab" data-tab="contact" aria-selected="false">Contact</button>
-    <button class="tab" data-tab="deploy" aria-selected="false">Deploy</button>
+  <nav class="console__tabs" role="tablist" aria-label="Console sections">
+    <button class="tab is-active" data-tab="leads" role="tab" aria-selected="true" aria-controls="panel-leads" id="tab-leads">Enquiries <span class="tab__badge" id="newCount" hidden>0</span></button>
+    <button class="tab" data-tab="health" role="tab" aria-selected="false" aria-controls="panel-health" id="tab-health">Site health</button>
+    <button class="tab" data-tab="contact" role="tab" aria-selected="false" aria-controls="panel-contact" id="tab-contact">Contact</button>
+    <button class="tab" data-tab="deploy" role="tab" aria-selected="false" aria-controls="panel-deploy" id="tab-deploy">Deploy</button>
   </nav>
 
   <main class="console__main">
 
     <!-- LEADS -->
-    <section class="panel is-active" id="panel-leads">
+    <section class="panel is-active" id="panel-leads" role="tabpanel" aria-labelledby="tab-leads">
       <div class="panel__head">
         <h2>Appointment enquiries</h2>
         <div class="lead-tools">
@@ -66,7 +66,7 @@
     </section>
 
     <!-- HEALTH -->
-    <section class="panel" id="panel-health" hidden>
+    <section class="panel" id="panel-health" role="tabpanel" aria-labelledby="tab-health" hidden>
       <div class="panel__head">
         <h2>Site health</h2>
         <button class="btn btn--ghost btn--sm" id="recheckHealth" type="button">Re-run checks</button>
@@ -109,7 +109,7 @@
     </section>
 
     <!-- CONTACT -->
-    <section class="panel" id="panel-contact" hidden>
+    <section class="panel" id="panel-contact" role="tabpanel" aria-labelledby="tab-contact" hidden>
       <h2>Contact details used on the site</h2>
       <div class="copy-grid">
         <div class="copy-item"><span>Main phone / WhatsApp</span><strong>+91 9993032780</strong><button class="copy-btn" data-copy="+91 9993032780" type="button">Copy</button></div>
@@ -130,7 +130,7 @@
     </section>
 
     <!-- DEPLOY -->
-    <section class="panel" id="panel-deploy" hidden>
+    <section class="panel" id="panel-deploy" role="tabpanel" aria-labelledby="tab-deploy" hidden>
       <h2>Publish changes</h2>
       <p class="hint">Every push to <code>main</code> deploys automatically to production.</p>
       <pre class="code"><code>git add -A
@@ -155,7 +155,7 @@ git push</code></pre>
   </footer>
 </div>
 
-<script src="/assets/js/admin-guard.js?v=7"></script>
-<script src="/assets/js/admin-app.js?v=7"></script>
+<script src="/assets/js/admin-guard.js?v=8"></script>
+<script src="/assets/js/admin-app.js?v=8"></script>
 </body>
 </html>

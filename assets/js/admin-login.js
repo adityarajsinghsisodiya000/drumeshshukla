@@ -2,6 +2,8 @@
 (function () {
   "use strict";
 
+  window.__mahakalAdminReady = true;
+
   var form = document.getElementById("loginForm");
   var input = document.getElementById("password");
   var error = document.getElementById("loginErr");

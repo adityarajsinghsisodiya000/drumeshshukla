@@ -404,11 +404,13 @@
   }
 
   /* ---------------- tabs, copy, boot ---------------- */
-  function showTab(name) {
+  function showTab(name, focusTab) {
     $$(".tab").forEach(function (btn) {
       var active = btn.getAttribute("data-tab") === name;
       btn.classList.toggle("is-active", active);
       btn.setAttribute("aria-selected", active ? "true" : "false");
+      btn.setAttribute("tabindex", active ? "0" : "-1");
+      if (active && focusTab) btn.focus();
     });
     $$(".panel").forEach(function (panel) {
       var active = panel.id === "panel-" + name;
@@ -417,8 +419,20 @@
     });
   }
 
-  $$(".tab").forEach(function (btn) {
+  var tabButtons = $$(".tab");
+  tabButtons.forEach(function (btn, index) {
+    btn.setAttribute("tabindex", btn.classList.contains("is-active") ? "0" : "-1");
     btn.addEventListener("click", function () { showTab(btn.getAttribute("data-tab")); });
+    btn.addEventListener("keydown", function (event) {
+      var next = null;
+      if (event.key === "ArrowRight") next = tabButtons[(index + 1) % tabButtons.length];
+      else if (event.key === "ArrowLeft") next = tabButtons[(index - 1 + tabButtons.length) % tabButtons.length];
+      else if (event.key === "Home") next = tabButtons[0];
+      else if (event.key === "End") next = tabButtons[tabButtons.length - 1];
+      if (!next) return;
+      event.preventDefault();
+      showTab(next.getAttribute("data-tab"), true);
+    });
   });
 
   document.addEventListener("click", function (event) {

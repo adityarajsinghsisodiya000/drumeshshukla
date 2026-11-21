@@ -18,19 +18,20 @@
 
   window.addEventListener("error", function (event) {
     var msg = event && event.message ? event.message : "Unknown script error";
-    bar("Console script error: " + msg + " — hard refresh karke dekhein (Ctrl+Shift+R).");
+    bar("Script error: " + msg + " — page reload karke dekhein (Ctrl+Shift+R).");
   });
 
   window.addEventListener("unhandledrejection", function (event) {
     var reason = event && event.reason ? String(event.reason) : "Unknown promise error";
-    bar("Console script error: " + reason);
+    bar("Script error: " + reason);
   });
 
   window.addEventListener("load", function () {
     window.setTimeout(function () {
-      if (!window.__mahakalAdminReady) {
-        bar("Admin script load nahi hua (extension ya purana cache block kar raha ho sakta hai). Ctrl+Shift+R dabaiye.");
-      }
-    }, 1800);
+      if (window.__mahakalAdminReady) return;
+      bar(
+        "Page script load nahi hua — browser extension ya purana cache block kar raha ho sakta hai. Ctrl+Shift+R dabaiye, ya incognito me kholiye."
+      );
+    }, 2200);
   });
 })();
