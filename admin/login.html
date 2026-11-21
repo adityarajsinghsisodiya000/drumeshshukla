@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Admin Login | Mahakal Neuro Wellness Center</title>
+<meta name="theme-color" content="#0f3d24">
+<link rel="stylesheet" href="/assets/css/fonts.css">
+<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/assets/css/admin.css?v=6">
+</head>
+<body class="admin-body">
+<div class="lock">
+  <div class="lock__card">
+    <span class="lock__mark"><img src="/assets/ayurveda_logo.png" alt="" width="52" height="52"></span>
+    <h1>Admin Login</h1>
+    <p class="lock__sub">Mahakal Neuro Wellness Center</p>
+
+    <form id="loginForm" autocomplete="on" novalidate>
+      <label for="password">Password</label>
+      <div class="lock__field">
+        <input id="password" name="password" type="password" placeholder="Enter admin password" autocomplete="current-password" required minlength="6">
+        <button type="button" class="lock__eye" id="togglePass" aria-label="Show password" aria-pressed="false">Show</button>
+      </div>
+      <p class="lock__err" id="loginErr" role="alert" aria-live="polite"></p>
+      <button class="btn btn--gold lock__btn" id="loginBtn" type="submit">Sign in</button>
+    </form>
+
+    <p class="lock__note">
+      Server-verified login. The session cookie is HttpOnly, Secure and expires after 8 hours.
+      Eight wrong attempts from one IP pause logins for 10 minutes.
+    </p>
+    <a class="lock__back" href="/">← Back to website</a>
+  </div>
+</div>
+<script src="/assets/js/admin-guard.js?v=6"></script>
+<script src="/assets/js/admin-login.js?v=6"></script>
+</body>
+</html>

@@ -5,6 +5,12 @@
   "redirects": [
     { "source": "/blog/:slug", "destination": "/blog-:slug.html", "permanent": true }
   ],
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "data": false
+    }
+  },
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -75,6 +81,10 @@
     },
     {
       "source": "/admin.html",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }]
+    },
+    {
+      "source": "/admin/(.*)",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }]
     }
   ]

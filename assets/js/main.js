@@ -332,6 +332,24 @@
         message: message ? message.value.trim() : ""
       };
 
+      /* Save the enquiry on the server first (best effort, never blocks the UX) */
+      try {
+        fetch("/api/leads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: data.name,
+            phone: data.phone,
+            condition: data.condition,
+            city: data.city,
+            time: data.time,
+            message: data.message,
+            page: location.pathname
+          }),
+          keepalive: true
+        }).catch(function () {});
+      } catch (error) {}
+
       var success = form.parentNode.querySelector(".form-success") || $(".form-success", form.parentNode);
       if (!success) {
         success = document.createElement("div");

@@ -5,12 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <title>Admin Console | Mahakal Neuro Wellness Center</title>
-<meta name="description" content="Internal site console for Mahakal Neuro Wellness Center.">
-<meta name="author" content="Aditya Raj Singh — https://github.com/adityarajsinghsisodiya000">
 <meta name="theme-color" content="#0f3d24">
-<link rel="stylesheet" href="assets/css/fonts.css">
-<link rel="stylesheet" href="assets/css/style.css">
-<link rel="stylesheet" href="assets/css/admin.css?v=5">
+<link rel="stylesheet" href="/assets/css/fonts.css">
+<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/assets/css/admin.css?v=6">
 </head>
 <body class="admin-body">
 <noscript><p class="admin-noscript">This console needs JavaScript. Enable it and reload.</p></noscript>
@@ -18,7 +16,7 @@
 <div class="console" id="console">
   <header class="console__bar">
     <div class="console__brand">
-      <span class="console__mark"><img src="assets/ayurveda_logo.png" alt="" width="38" height="38"></span>
+      <span class="console__mark"><img src="/assets/ayurveda_logo.png" alt="" width="38" height="38"></span>
       <span>
         <strong>Site Console</strong>
         <small>Mahakal Neuro Wellness Center</small>
@@ -26,23 +24,53 @@
       <span class="console__tag" id="bootState">starting…</span>
     </div>
     <div class="console__actions">
-      <a class="console__link" href="index.html" target="_blank" rel="noopener">Open site ↗</a>
+      <a class="console__link" href="/" target="_blank" rel="noopener">Open site ↗</a>
+      <button class="console__logout" id="logout" type="button">Sign out</button>
     </div>
   </header>
 
   <nav class="console__tabs" aria-label="Console sections">
-    <button class="tab is-active" data-tab="overview" aria-selected="true">Overview</button>
-    <button class="tab" data-tab="pages" aria-selected="false">Pages</button>
-    <button class="tab" data-tab="security" aria-selected="false">Security</button>
+    <button class="tab is-active" data-tab="leads" aria-selected="true">Enquiries <span class="tab__badge" id="newCount" hidden>0</span></button>
+    <button class="tab" data-tab="health" aria-selected="false">Site health</button>
     <button class="tab" data-tab="contact" aria-selected="false">Contact</button>
     <button class="tab" data-tab="deploy" aria-selected="false">Deploy</button>
   </nav>
 
   <main class="console__main">
 
-    <!-- OVERVIEW -->
-    <section class="panel is-active" id="panel-overview">
-      <h2>Overview</h2>
+    <!-- LEADS -->
+    <section class="panel is-active" id="panel-leads">
+      <div class="panel__head">
+        <h2>Appointment enquiries</h2>
+        <div class="lead-tools">
+          <button class="btn btn--ghost btn--sm" id="refreshLeads" type="button">Refresh</button>
+          <button class="btn btn--ghost btn--sm" id="exportCsv" type="button">Export CSV</button>
+        </div>
+      </div>
+      <p class="hint">Har form submission yahan server par save hoti hai, phir visitor WhatsApp par jaata hai.</p>
+
+      <div class="lead-filters">
+        <input id="search" type="search" placeholder="Naam, number ya condition search karein" aria-label="Search enquiries">
+        <select id="statusFilter" aria-label="Filter by status">
+          <option value="all">Saare</option>
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="booked">Booked</option>
+          <option value="closed">Closed</option>
+        </select>
+      </div>
+
+      <div class="lead-stats" id="leadStats"></div>
+      <p class="lead-msg" id="leadMsg" role="status" aria-live="polite"></p>
+      <div id="leadList" class="lead-list"><p class="hint">Loading…</p></div>
+    </section>
+
+    <!-- HEALTH -->
+    <section class="panel" id="panel-health" hidden>
+      <div class="panel__head">
+        <h2>Site health</h2>
+        <button class="btn btn--ghost btn--sm" id="recheckHealth" type="button">Re-run checks</button>
+      </div>
       <div class="stat-grid">
         <article class="stat">
           <span class="stat__label">Live website</span>
@@ -55,58 +83,29 @@
           <span class="stat__meta">HTML routes</span>
         </article>
         <article class="stat">
-          <span class="stat__label">Last commit</span>
-          <strong class="stat__value" id="statCommit">—</strong>
-          <span class="stat__meta" id="statCommitMeta">reads the GitHub repo</span>
-        </article>
-        <article class="stat">
           <span class="stat__label">Security score</span>
           <strong class="stat__value" id="statScore">—</strong>
           <span class="stat__meta" id="statScoreMeta">header checks</span>
         </article>
+        <article class="stat">
+          <span class="stat__label">Last commit</span>
+          <strong class="stat__value" id="statCommit">—</strong>
+          <span class="stat__meta" id="statCommitMeta">GitHub repo</span>
+        </article>
       </div>
 
-      <h3>Quick links</h3>
-      <ul class="link-list">
-        <li><a href="https://drumeshshukla.vercel.app" target="_blank" rel="noopener">Live site<small>drumeshshukla.vercel.app</small></a></li>
-        <li><a href="https://vercel.com/baneshwari/drumeshshukla" target="_blank" rel="noopener">Vercel dashboard<small>deployments &amp; logs</small></a></li>
-        <li><a href="https://github.com/adityarajsinghsisodiya000/drumeshshukla" target="_blank" rel="noopener">GitHub repository<small>source of truth</small></a></li>
-        <li><a href="https://search.google.com/search-console" target="_blank" rel="noopener">Search Console<small>indexing &amp; queries</small></a></li>
-      </ul>
-    </section>
+      <h3>Security checks</h3>
+      <div class="check-grid" id="checkGrid"></div>
 
-    <!-- PAGES -->
-    <section class="panel" id="panel-pages" hidden>
-      <div class="panel__head">
-        <h2>Pages</h2>
-        <button class="btn btn--ghost btn--sm" id="recheckPages" type="button">Re-check all</button>
-      </div>
-      <p class="hint">Live response for every route on the production domain.</p>
+      <h3>Routes</h3>
       <div class="table-wrap">
         <table class="table" id="pagesTable">
           <thead>
-            <tr><th scope="col">Route</th><th scope="col">Status</th><th scope="col">Size</th><th scope="col">Time</th><th scope="col"></th></tr>
+            <tr><th scope="col">Route</th><th scope="col">Status</th><th scope="col">Size</th><th scope="col">Time</th></tr>
           </thead>
-          <tbody><tr><td colspan="5" class="table__empty">Checking…</td></tr></tbody>
+          <tbody><tr><td colspan="4" class="table__empty">Checking…</td></tr></tbody>
         </table>
       </div>
-    </section>
-
-    <!-- SECURITY -->
-    <section class="panel" id="panel-security" hidden>
-      <div class="panel__head">
-        <h2>Security</h2>
-        <button class="btn btn--ghost btn--sm" id="recheckSecurity" type="button">Re-run checks</button>
-      </div>
-      <p class="hint">Reads the live response headers and page markup from this domain.</p>
-      <div class="check-grid" id="checkGrid"></div>
-      <h3>Notes</h3>
-      <ul class="notes">
-        <li>No backend, no database and no cookies are used, so there is no server to attack.</li>
-        <li>Forms never post to a server — they hand the visitor to WhatsApp, so no lead data is stored.</li>
-        <li>The public repository is the only way to change content; keep GitHub and Vercel accounts protected with 2FA.</li>
-        <li>This console only shows public information, so it has no login — the real control is your GitHub and Vercel account.</li>
-      </ul>
     </section>
 
     <!-- CONTACT -->
@@ -123,7 +122,7 @@
 
       <h3>Social &amp; review links</h3>
       <ul class="link-list">
-        <li><a href="https://www.facebook.com/profile.php?id=61589805816757" target="_blank" rel="noopener">Facebook<small>profile.php?id=61589805816757</small></a></li>
+        <li><a href="https://www.facebook.com/profile.php?id=61589805816757" target="_blank" rel="noopener">Facebook<small>clinic page</small></a></li>
         <li><a href="https://www.instagram.com/dr_umesh_shukla/" target="_blank" rel="noopener">Instagram<small>@dr_umesh_shukla</small></a></li>
         <li><a href="https://www.google.com/maps/place/Mahakal+Ayurveda+-+Neuro+Spine+Panchkarma+Center/@23.1809704,75.7876247,17z" target="_blank" rel="noopener">Google Maps<small>clinic listing</small></a></li>
         <li><a href="https://search.google.com/local/writereview?placeid=ChIJe7Vbnj51YzkRvKglRt5k9mc" target="_blank" rel="noopener">Google review link<small>send to happy patients</small></a></li>
@@ -134,22 +133,18 @@
     <section class="panel" id="panel-deploy" hidden>
       <h2>Publish changes</h2>
       <p class="hint">Every push to <code>main</code> deploys automatically to production.</p>
-      <ol class="steps">
-        <li><strong>Edit</strong> the files in the project folder on your computer.</li>
-        <li><strong>Preview</strong> locally, or review the page in the browser.</li>
-        <li><strong>Publish</strong> with the commands below.</li>
-      </ol>
       <pre class="code"><code>git add -A
 git commit -m "content update"
 git push</code></pre>
       <button class="btn btn--gold btn--sm" data-copy="git add -A&#10;git commit -m &quot;content update&quot;&#10;git push" type="button">Copy commands</button>
 
-      <h3>Access</h3>
-      <p class="hint">
-        This console is unlisted and marked <code>noindex</code>, but it is a static page, so it has no login.
-        Everything it shows is already public. Keep the GitHub repository and the Vercel project protected with
-        two-factor authentication — that is what really controls the site.
-      </p>
+      <h3>How this console works</h3>
+      <ul class="notes">
+        <li>Login is verified on the server (signed HttpOnly cookie, 8 hour session).</li>
+        <li>Enquiries are encrypted (AES-256-GCM) before they are stored in the <code>data</code> branch, so the public repository only holds ciphertext.</li>
+        <li>Each form submission also opens WhatsApp, so the visitor can confirm instantly.</li>
+        <li>The site itself stays fully static — no database to maintain, no monthly cost.</li>
+      </ul>
     </section>
 
   </main>
@@ -160,7 +155,7 @@ git push</code></pre>
   </footer>
 </div>
 
-<script src="assets/js/admin-guard.js?v=5"></script>
-<script src="assets/js/admin.js?v=5"></script>
+<script src="/assets/js/admin-guard.js?v=6"></script>
+<script src="/assets/js/admin-app.js?v=6"></script>
 </body>
 </html>

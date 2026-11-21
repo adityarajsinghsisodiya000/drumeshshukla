@@ -52,6 +52,44 @@ Then visit `http://localhost:8000/`.
 
 Production deployment: **https://drumeshshukla.vercel.app** (Vercel)
 
+## Admin console
+
+**https://drumeshshukla.vercel.app/admin** → redirects to a server-verified login, then opens the
+console. This is the only page on the site with a backend.
+
+| Tab | What it does |
+| --- | --- |
+| Enquiries | Every appointment form submission, with search, status (New → Contacted → Booked → Closed), one-tap WhatsApp reply, delete and CSV export |
+| Site health | Live status of all 15 routes, security header score, last commit |
+| Contact | Phone, addresses, OPD timings, social and review links with copy buttons |
+| Deploy | Publish commands and how the data flow works |
+
+**How it is secured**
+
+- `POST /api/login` compares the password against a scrypt hash (`ADMIN_PASSWORD_HASH`) with
+  `timingSafeEqual`; 8 wrong attempts from one IP pause logins for 10 minutes.
+- The session is a signed HMAC cookie — `HttpOnly`, `Secure`, `SameSite=Lax`, 8 hours.
+- `middleware.js` checks that cookie at the edge and redirects `/admin` to `/admin/login` before
+  any HTML is served, so the console markup is never shipped to a signed-out visitor.
+- Lead data lives in a separate `data` branch, encrypted with AES-256-GCM (`LEADS_KEY`) — the public
+  repository only ever contains ciphertext, and that branch is excluded from deployments.
+- Forms still hand off to WhatsApp after saving, so a visitor is never blocked by the network.
+
+**Environment variables** (set in Vercel → Project → Settings → Environment Variables)
+
+| Name | Purpose |
+| --- | --- |
+| `ADMIN_PASSWORD_HASH` | `scrypt$<salt hex>$<hash hex>` for the admin password |
+| `SESSION_SECRET` | Random 32-byte hex — signs session cookies in `api/` and `middleware.js` |
+| `LEADS_KEY` | Random 32-byte hex — encrypts the enquiry store |
+| `GH_DATA_TOKEN` | GitHub token with contents read/write on the repo (data branch only) |
+
+Regenerate the password hash:
+
+```bash
+node -e "const c=require('crypto');const p=process.argv[1];const s=c.randomBytes(16);console.log('scrypt$'+s.toString('hex')+'$'+c.scryptSync(p,s,32).toString('hex'))" "new-password"
+```
+
 ## Designed & developed by
 
 **Aditya Raj Singh** — [github.com/adityarajsinghsisodiya000](https://github.com/adityarajsinghsisodiya000)
