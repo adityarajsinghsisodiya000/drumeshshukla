@@ -129,7 +129,7 @@
   color: #ff9b8a;
   font-size: 0.8rem;
 }
-.lock__btn { width: 100%; justify-content: center; margin-top: 4px; }
+.lock__btn { width: 100%; justify-content: center; margin-top: 4px; min-height: 52px; padding: 0 20px; font-size: 0.95rem; }
 .lock__note {
   margin-top: 22px;
   font-size: 0.72rem;
@@ -647,7 +647,7 @@
   .copy-item { flex-wrap: wrap; }
   .copy-btn { height: 42px; }
   .lead-filters input, .lead-filters select { width: 100%; flex: 1 1 100%; }
-  .btn--sm { min-height: 40px; }
+  .btn--sm { min-height: 44px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
